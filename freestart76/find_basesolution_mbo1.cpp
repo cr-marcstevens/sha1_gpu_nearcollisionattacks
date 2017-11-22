@@ -551,7 +551,7 @@ void verify(int firststep, int laststep)
 
 	found_basesol(main_m1, main_Q1, mainblockoffset);
 
-	if (callcount == 1 && !BASESOL_OK) exit(0);
+//	if (callcount == 1 && !BASESOL_OK) exit(0);
 
 // [1900] end verify()
 }
