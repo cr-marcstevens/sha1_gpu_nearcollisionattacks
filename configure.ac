@@ -7,7 +7,8 @@ AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([foreign subdir-objects])
 
 
-DEFAULT_CXXFLAGS="-O2 -Wfatal-errors -m64"
+DEFAULT_CXXFLAGS="-O2 -Wfatal-errors"
+dnl DEFAULT_CXXFLAGS="-ggdb -g"
 AS_IF([test "x$CXXFLAGS" = "x"],
 	[CXXFLAGS="$DEFAULT_CXXFLAGS"]
 	[usedefaultcxxflags=yes],

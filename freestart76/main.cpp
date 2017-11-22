@@ -678,8 +678,8 @@ int main(int argc, char** argv)
 {
 
 	timer runtime(true);
-	try 
-	{
+//	try 
+//	{
 		uint64_t seedval = (uint64_t(xrng128())<<32) | uint64_t(xrng128());
 
 		po::options_description
@@ -777,13 +777,15 @@ int main(int argc, char** argv)
 				{
 					// start a separate thread to process and store basesols to disk
 					std::thread tmp(process_basesol);
+					// start the attack in the main thread
+					start_attack(); // never returns
 				}
 				else
 				{
 					cout << "Warning: no outputfile given, results will be lost." << endl;
+					// start the attack in the main thread
+					start_attack(); // never returns
 				}
-				// start the attack in the main thread
-				start_attack(); // never returns
 			}
 		}
 #ifndef NOCUDA
@@ -850,11 +852,11 @@ int main(int argc, char** argv)
 			}
 			fprintf(stderr, "\n%d conflicts in total\n", count);
 		}
-	}
-	catch (std::exception& e)
-	{
-		cerr << "Caught exception:" << endl << e.what() << endl;
-	}
+//	}
+//	catch (std::exception& e)
+//	{
+//		cerr << "Caught exception:" << endl << e.what() << endl;
+//	}
 	cout << "Runtime: " << runtime.time() << endl;
 	return 0;
 }
