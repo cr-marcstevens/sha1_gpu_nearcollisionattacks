@@ -9,12 +9,6 @@
 #include "main.hpp"
 #include "neutral_bits_packing.hpp"
 
-//#define CPU_PERFORMANCE
-
-#ifdef CPU_PERFORMANCE
-#include "util/cpuperformance.hpp"
-#endif
-
 /*** Bit condition masks for steps Q-4 to Q80, stored on the device in constant memory ***/
 
 // QOFF: value for Q_t is at index QOFF+t in tables below
