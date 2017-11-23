@@ -666,7 +666,10 @@ int main(int argc, char** argv)
 	timer::timer runtime;
 	try 
 	{
-		uint64_t seedval = (uint64_t(xrng128())<<32) | uint64_t(xrng128());
+		std::string seedstr;
+		const char* seedchars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		for (int i = 0; i < 22; ++i)
+			seedstr += seedchars[xrng128() % 62];
 		max_basesols = 0;
 
 		po::options_description
@@ -690,7 +693,7 @@ int main(int argc, char** argv)
 			;
 		opt_opts.add_options()
 			("seed,s"
-				, po::value<uint64_t>(&seedval)
+				, po::value<string>(&seedstr)
 				, "Set SEED value")
 			("inputfile,i"
 				, po::value<vector< string> >(&inputfile)
@@ -738,12 +741,14 @@ int main(int argc, char** argv)
 			cout << opt_cmds << opt_opts << endl;
 			return 0;
 		}
-		// process seed for activities that need them
-		if (vm.count("genbasesol"))
+		// process seed str
+		cout << "Current seed string: " << seedstr << endl;
+		seed(0);
+		for (int i = 0; i < seedstr.size(); ++i)
 		{
-			cout << "Using seed " << seedval << "." << endl;
-			seed( uint32_t(seedval&0xFFFFFFFF) );
-			addseed( uint32_t(seedval>>32) );
+			uint32_t x = uint32_t(seedstr[i]);
+			x = rotate_right( (x<<24)|(x<<16)|(x<<8)|x, (i&31) );
+			addseed(x ^ i);
 		}
 
 		if (vm.count("query"))
