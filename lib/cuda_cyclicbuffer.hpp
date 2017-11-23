@@ -5,6 +5,36 @@
   This file is part of sha1freestart80 source-code and released under the MIT License
 *****/
 
+#include <stdint.h>
+
+// fencetype
+// - 0 none
+// - 1 block-wide
+// - 2 gpu-wide
+template<int fencetype> __device__ void memoryfence() { __threadfence(); }
+template<>              __device__ void memoryfence<0>() {}
+template<>              __device__ void memoryfence<1>() { __threadfence_block(); }
+
+//// cyclic buffer mask version control struct: to be placed in fast CUDA 'shared' memory
+// template<size_t N> class cyclic_buffer_control_mask_t;
+
+//// cyclic buffer mask version storage struct: to be placed in main CUDA 'global' memory
+// template<size_t N, typename val_t = uint32_t, size_t val_cnt = 1, typename control_type = cyclic_buffer_control_mask_t<N>, int fencetype = 2 >
+// class cyclic_buffer_mask_t;
+
+//// cyclic buffer cas version control struct: to be placed in fast CUDA 'shared' memory
+// template<size_t N> class cyclic_buffer_control_cas_t;
+
+//// cyclic buffer cas version storage struct: to be placed in main CUDA 'global' memory
+// template<size_t N, typename val_t = uint32_t, size_t val_cnt = 1, typename control_type = cyclic_buffer_control_cas_t<N>, int fencetype = 2 >
+// class cyclic_buffer_cas_t;
+
+//// temporary buffer of 64*2 words in fast CUDA 'shared' memory
+//// to ensure writes to cyclic buffer (with N=1,2) happen in blocks of 32 words
+// class warp_tmp_buf_t;
+
+
+/* UTILITY TYPES */
 template<bool b>
 struct assert_compile_time_bool
 {
@@ -16,7 +46,14 @@ struct assert_compile_time_bool<true>
 };
 #define ASSERT_COMPILE_TIME(b) { typename assert_compile_time_bool< (b) >::compile_time_bool_is_true ___assert = true; if (!___assert) { printf("boooh!"); } }
 
-/***** MASK VERSION *****/
+template<size_t i, bool pred = true>
+struct pred_t {};
+
+
+
+/******************************************** MASK VERSION *****************************************/
+/******************************************** MASK VERSION *****************************************/
+/******************************************** MASK VERSION *****************************************/
 
 // control logic using mask version
 template<size_t N>
@@ -153,16 +190,6 @@ class cyclic_buffer_control_mask_t
 };
 
 
-// fencetype
-// - 0 none
-// - 1 block-wide
-// - 2 gpu-wide
-template<int fencetype> __device__ void memoryfence() { __threadfence(); }
-template<>              __device__ void memoryfence<0>() {}
-template<>              __device__ void memoryfence<1>() { __threadfence_block(); }
-
-template<size_t i, bool pred = true>
-struct pred_t {};
 
 template<size_t N, typename val_t = uint32_t, size_t val_cnt = 1, typename control_type = cyclic_buffer_control_mask_t<N>, int fencetype = 2 >
 class cyclic_buffer_mask_t
@@ -308,7 +335,9 @@ class cyclic_buffer_mask_t
 
 
 
-/****** CAS ******/
+/******************************************** CAS VERSION *****************************************/
+/******************************************** CAS VERSION *****************************************/
+/******************************************** CAS VERSION *****************************************/
 
 // control logic using CAS version
 template<size_t N>
@@ -393,7 +422,6 @@ class cyclic_buffer_control_cas_t
 			// increase failed due to race, try again
 		}
 	}
-
 
 	// variant partial warp read
 	// assumes entire warp calls this function with identical inputs
@@ -580,7 +608,10 @@ class cyclic_buffer_cas_t
 
 
 
-/***** TEMPORARY BUFFER ******/
+/******************************************** TEMPORARY BUFFER *****************************************/
+/******************************************** TEMPORARY BUFFER *****************************************/
+/******************************************** TEMPORARY BUFFER *****************************************/
+
 class warp_tmp_buf_t
 {
 	public:

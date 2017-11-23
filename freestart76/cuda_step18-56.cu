@@ -36,7 +36,7 @@
 
 
 #include "main.hpp"
-#include "cyclicbuffer.hpp"
+#include <cuda_cyclicbuffer.hpp>
 
 #include <fstream>
 #include <cstdio>

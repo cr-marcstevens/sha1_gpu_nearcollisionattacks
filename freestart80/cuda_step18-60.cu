@@ -41,8 +41,8 @@
 
 
 #include "main.hpp"
-#include "cyclicbuffer.hpp"
 #include "neutral_bits_packing.hpp"
+#include <cuda_cyclicbuffer.hpp>
 
 #include <map>
 #include <fstream>
