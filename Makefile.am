@@ -3,7 +3,7 @@ SUFFIXES=.cu
 EXTRA_DIST       = README.md LICENSE.TXT
 ACLOCAL_AMFLAGS  = -I m4
 
-AM_CPPFLAGS=-I$(top_srcdir)/lib
+AM_CPPFLAGS=-I$(top_srcdir)/lib -I$(top_srcdir)/contrib
 
 noinst_LIBRARIES=lib/libutil.a
 
@@ -20,28 +20,29 @@ lib_libutil_a_SOURCES=\
 	lib/base64.hpp \
 	lib/rng.cpp lib/rng.hpp \
 	lib/sha1detail.cpp lib/sha1detail.hpp \
-	lib/timer.cpp lib/timer.hpp
+	lib/cuda_cyclicbuffer.hpp \
+	contrib/program_options.hpp \
+	contrib/base64.hpp \
+	contrib/timer.hpp
 
 
 
 bin_sha1_freestart76_gpuattack_SOURCES=\
 	freestart76/main.cpp freestart76/main.hpp \
-	freestart76/cyclicbuffer.hpp \
 	freestart76/tables.hpp \
-	freestart76/find_basesolution_mbo1.cpp \
+	freestart76/find_basesols.cpp \
 	freestart76/cpu_step18-56.cpp \
 	freestart76/cuda_step18-56.cu \
-	freestart76/sha1benchmark.cu
+	lib/sha1benchmark.cu
 
 bin_sha1_freestart76_gpuattack_LDADD=lib/libutil.a $(CUDA_LIBS)
 
 bin_sha1_freestart76_basesolgen_SOURCES=\
 	freestart76/main.cpp freestart76/main.hpp \
-	freestart76/cyclicbuffer.hpp \
 	freestart76/tables.hpp \
-	freestart76/find_basesolution_mbo1.cpp \
+	freestart76/find_basesols.cpp \
 	freestart76/cpu_step18-56.cpp \
-	freestart76/cuda_dummy.cpp
+	lib/cuda_dummy.cpp
 
 bin_sha1_freestart76_basesolgen_LDADD=lib/libutil.a $(CUDA_LIBS)
 
@@ -51,22 +52,20 @@ freestart76: bin/sha1_freestart76_gpuattack bin/sha1_freestart76_basesolgen
 
 bin_sha1_freestart80_gpuattack_SOURCES=\
 	freestart80/main.cpp freestart80/main.hpp \
-	freestart80/cyclicbuffer.hpp \
 	freestart80/tables.hpp \
-	freestart80/find_basesolution_mbo1.cpp \
+	freestart80/find_basesols.cpp \
 	freestart80/cpu_step18-60.cpp \
 	freestart80/cuda_step18-60.cu \
-	freestart80/sha1benchmark.cu
+	lib/sha1benchmark.cu
 
 bin_sha1_freestart80_gpuattack_LDADD=lib/libutil.a $(CUDA_LIBS)
 
 bin_sha1_freestart80_basesolgen_SOURCES=\
 	freestart80/main.cpp freestart80/main.hpp \
-	freestart80/cyclicbuffer.hpp \
 	freestart80/tables.hpp \
-	freestart80/find_basesolution_mbo1.cpp \
+	freestart80/find_basesols.cpp \
 	freestart80/cpu_step18-60.cpp \
-	freestart80/cuda_dummy.cpp
+	lib/cuda_dummy.cpp
 
 bin_sha1_freestart80_basesolgen_LDADD=lib/libutil.a $(CUDA_LIBS)
 

@@ -10,6 +10,11 @@
 
 // [-80] include files local
 #include "main.hpp"
+#include "rng.hpp"
+#include "sha1detail.hpp"
+using namespace std;
+using namespace hc;
+
 inline uint32_t rng() { return xrng128(); }
 
 
@@ -2116,5 +2121,3 @@ void start_attack()
 
 // [100000900] end function start_attack()
 }
-
-

@@ -1,14 +1,24 @@
 #include "main.hpp"
 
-/*** Bit condition masks for steps Q-4 to Q80, stored on the device in constant memory ***/
-
-// QOFF: value for Q_t is at index QOFF+t in tables below
-#define QOFF 4
-
 namespace cpu {
 #include "tables.hpp"
 }
 using namespace cpu;
+
+#include "sha1detail.hpp"
+#include "rng.hpp"
+
+#include <timer.hpp>
+
+#include <iostream>
+
+using namespace std;
+using namespace hc;
+
+/*** Bit condition masks for steps Q-4 to Q80, stored on the device in constant memory ***/
+
+// QOFF: value for Q_t is at index QOFF+t in tables below
+#define QOFF 4
 
 /// Neutral bits positions //////////////
 /// W14: ..................xxxxxxxxx.....
@@ -99,7 +109,7 @@ struct worker_t {
 	uint32_t Q2[85];
 
 	uint64_t count;
-	hc::timer runtime;
+	timer::timer runtime;
 
 #define UPDATE(t)
 

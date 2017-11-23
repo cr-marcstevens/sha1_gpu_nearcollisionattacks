@@ -7,10 +7,10 @@ export GPUATTACK=$BINDIR/sha1_freestart76_gpuattack
 echo "Generating basesolutions for 21 minutes..."
 # Generate base solutions for 21 minutes
 SEED=$RANDOM$RANDOM$RANDOM
-$BASESOLGEN --seed 1$SEED -f -o basesol76_1.bin > basesol76_1.log &
-$BASESOLGEN --seed 2$SEED -f -o basesol76_2.bin > basesol76_2.log &
-$BASESOLGEN --seed 3$SEED -f -o basesol76_3.bin > basesol76_3.log &
-$BASESOLGEN --seed 4$SEED -f -o basesol76_4.bin > basesol76_4.log &
+$BASESOLGEN --seed 1$SEED -g -m 262144 -o basesol76_1.bin > basesol76_1.log &
+$BASESOLGEN --seed 2$SEED -g -m 262144 -o basesol76_2.bin > basesol76_2.log &
+$BASESOLGEN --seed 3$SEED -g -m 262144 -o basesol76_3.bin > basesol76_3.log &
+$BASESOLGEN --seed 4$SEED -g -m 262144 -o basesol76_4.bin > basesol76_4.log &
 
 echo "21 minutes left..."
 for ((i=20; i>=0; --i)); do 
@@ -33,10 +33,10 @@ for ((i=1;;++i)); do
 
 	# start new generation of basesolutions in background
 	SEED=$RANDOM$RANDOM$RANDOM
-	$BASESOLGEN --seed 1${i}0$SEED -f -o basesol76_1.bin >> basesol76_1.log &
-	$BASESOLGEN --seed 2${i}0$SEED -f -o basesol76_2.bin >> basesol76_2.log &
-	$BASESOLGEN --seed 3${i}0$SEED -f -o basesol76_3.bin >> basesol76_3.log &
-	$BASESOLGEN --seed 4${i}0$SEED -f -o basesol76_4.bin >> basesol76_4.log &
+	$BASESOLGEN --seed 1${i}0$SEED -g -m 262144 -o basesol76_1.bin >> basesol76_1.log &
+	$BASESOLGEN --seed 2${i}0$SEED -g -m 262144 -o basesol76_2.bin >> basesol76_2.log &
+	$BASESOLGEN --seed 3${i}0$SEED -g -m 262144 -o basesol76_3.bin >> basesol76_3.log &
+	$BASESOLGEN --seed 4${i}0$SEED -g -m 262144 -o basesol76_4.bin >> basesol76_4.log &
 
 	# start timer for 21 minutes
 	rm -f basesol76.20min.timer

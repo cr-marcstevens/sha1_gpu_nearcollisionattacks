@@ -8,21 +8,14 @@
 #ifndef MAIN_HPP
 #define MAIN_HPP
 
-
-#include <iostream>
-#include <stdexcept>
-#include <vector>
-#include <set>
-#include <cstring>
-
 #include "types.hpp"
-#include "rng.hpp"
-#include "timer.hpp"
-#include "sha1detail.hpp"
-#include "base64.hpp"
 
-using namespace hc;
-using namespace std;
+#include <base64.hpp>
+
+#include <cstring>
+#include <vector>
+#include <string>
+#include <stdexcept>
 
 void gpusha1benchmark();
 
@@ -42,10 +35,12 @@ struct q60sol_t {
 };
 
 extern int cuda_device, cuda_blocks, cuda_threads_per_block;
-extern vector<string> inputfile;
-extern string outputfile;
+extern std::vector<std::string> inputfile;
+extern std::string outputfile;
 extern bool disable_backwards_filter;
 extern int cuda_scheduler;
+
+bool compiled_with_cuda();
 
 void cuda_query();
 

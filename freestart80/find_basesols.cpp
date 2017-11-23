@@ -17,6 +17,12 @@
 
 // [-80] include files local
 #include "main.hpp"
+#include "rng.hpp"
+#include "sha1detail.hpp"
+
+using namespace hc;
+using namespace std;
+
 inline uint32_t rng() { return xrng128(); }
 
 // [-60] global tables const

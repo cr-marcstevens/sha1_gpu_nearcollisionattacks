@@ -5,14 +5,27 @@
   This file is part of sha1freestart80 source-code and released under the MIT License
 *****/
 
+#include "main.hpp"
+//#include "neutral_bits_packing.hpp"
+#include "sha1detail.hpp"
+#include "rng.hpp"
+
+namespace maincpp {
+#include "tables.hpp"
+}
+using namespace maincpp;
+
+#include <timer.hpp>
+#include <program_options.hpp>
+
+#include <iostream>
 #include <fstream>
 #include <iomanip>
 #include <algorithm>
 
-#include "neutral_bits_packing.hpp"
-#include "main.hpp"
-
 using namespace hc;
+using namespace std;
+namespace po = program_options;
 
 int cuda_device, cuda_blocks, cuda_threads_per_block;
 vector<string> inputfile;
@@ -21,10 +34,6 @@ bool disable_backwards_filter = false;
 int cuda_scheduler;
 int max_basesols;
  
-namespace maincpp {
-#include "tables.hpp"
-}
-using namespace maincpp;
 
 
 bool verifyQ60(const q60sol_t& q60sol)
@@ -426,174 +435,103 @@ void found_basesol(uint32_t main_m1[80], uint32_t main_Q1[85], unsigned mainbloc
 }
 
 
-void sanity_checks()
-{
-	if (W14NBALLM != (W14NBQ18M | W14NBQ19M)) cout << "W14NBALLM bad" << endl;
-	if (W14NBALLM != (W14NBQ18M ^ W14NBQ19M)) cout << "W14NBQ*M bad" << endl;
-
-	if (W15NBALLM != (W15NBQ18M | W15NBQ19M | W15NBQ20M)) cout << "W15NBALLM bad" << endl;
-	if (W15NBALLM != (W15NBQ18M ^ W15NBQ19M ^ W15NBQ20M)) cout << "W15NQ*M bad" << endl;
-
-	if (W16NBALLM != (W16NBQ19M | W16NBQ20M)) cout << "W16NBALLM bad" << endl;
-	if (W16NBALLM != (W16NBQ19M ^ W16NBQ20M)) cout << "W16NQ*M bad" << endl;
-
-	if (W17NBALLM != (W17NBQ20M | W17NBQ21M)) cout << "W17NBALLM bad" << endl;
-	if (W17NBALLM != (W17NBQ20M ^ W17NBQ21M)) cout << "W17NQ*M bad" << endl;
-
-	if (W17NBALLM != (W17NBBASM | W17NBEXTM)) cout << "W17NBALLM bad" << endl;
-	if (W17NBALLM != (W17NBBASM ^ W17NBEXTM)) cout << "W17NBASEXTM bad" << endl;
-
-	if (W18NBALLM != (W18NBQ21M | W18NBQ22M | W18NBQ23M)) cout << "W18NBALLM bad" << endl;
-	if (W18NBALLM != (W18NBQ21M ^ W18NBQ22M ^ W18NBQ23M)) cout << "W18NQ*M bad" << endl;
-
-	if (W19NBALLM != (W19NBQ22M | W19NBQ23M | W19NBQ24M)) cout << "W19NBALLM bad" << endl;
-	if (W19NBALLM != (W19NBQ22M ^ W19NBQ23M ^ W19NBQ24M)) cout << "W19NQ*M bad" << endl;
-
-	if (W20NBALLM != (W20NBQ23M | W20NBQ24M | W20NBQ25M)) cout << "W20NBALLM bad" << endl;
-	if (W20NBALLM != (W20NBQ23M ^ W20NBQ24M ^ W20NBQ25M)) cout << "W20NQ*M bad" << endl;
-
-}
-
-
 int main(int argc, char** argv)
 {
-	sanity_checks();
-
-	// extern int cuda_device, cuda_blocks, cuda_threads_per_block;
-	// extern vector<string> inputfile;
-	// extern string outputfile;
-	// extern bool disable_backwards_filter;
-	// extern int cuda_scheduler;
-
-	// DEFAULTS
-	cuda_device = 0; // default is to use first CUDA device
-	cuda_blocks = -1; // automatic
-	cuda_threads_per_block = -1; // automatic
-	cuda_scheduler = 3; // 0=auto, 1=spin, 2=yield, 3=blockingsync
-
-	std::string seedstr;
-	const char* seedchars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	for (int i = 0; i < 22; ++i)
-		seedstr += seedchars[xrng128() % 62];
-
-
-	// Parse arguments
-	
-	enum { Help, Query, Benchmark, Attack, Basesol, Verify } command = Help;
-	for (int argi = 1; argi < argc; ++argi)
+	timer::timer runtime;
+	try
 	{
-		std::string stri(argv[argi]);
-		if (stri == "-h" || stri == "--help")
-		{
-		}
-		else if (stri == "-g" || stri == "--genbasesol")
-		{
-			command = Basesol;
-		}
-		else if (stri == "-v" || stri == "--verify")
-		{
-			command = Verify;
-		}
-		else if (stri == "-i" || stri == "--input")
-		{
-			if (++argi < argc)
-				inputfile.push_back(std::string(argv[argi]));
-		}
-		else if (stri == "-o" || stri == "--output")
-		{
-			if (++argi < argc)
-				outputfile = std::string(argv[argi]);
-		}
-		else if (stri == "-r" || stri == "--rndseed")
-		{
-			if (++argi < argc)
-				seedstr = std::string(argv[argi]);
-		}
-		else if (stri == "-m" || stri == "--maxbasesol")
-		{
-			if (++argi < argc)
-				max_basesols = atoi(argv[argi]);
-		}
-#ifndef NOCUDA
-		else if (stri == "-q" || stri == "--query")
-		{
-			command = Query;
-		}
-		else if (stri == "-b" || stri == "--benchmark")
-		{
-			command = Benchmark;
-		}
-		else if (stri == "-a" || stri == "--attack")
-		{
-			command = Attack;
-		}
-		else if (stri == "-d" || stri == "--device")
-		{
-			if (++argi < argc)
-				cuda_device = atoi(argv[argi]);
-		}
-		else if (stri == "-s" || stri == "--cudasched")
-		{
-			if (++argi < argc)
-				cuda_scheduler = atoi(argv[argi]);
-		}
-		else if (stri == "--gpublocks")
-		{
-			if (++argi < argc)
-				cuda_blocks = atoi(argv[argi]);
-		}
-		else if (stri == "--gputhreads")
-		{
-			if (++argi < argc)
-				cuda_threads_per_block = atoi(argv[argi]);
-		}
-#endif
-	}
+		std::string seedstr;
+		const char* seedchars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		for (int i = 0; i < 22; ++i)
+			seedstr += seedchars[xrng128() % 62];
+		max_basesols = 0;
 
-	// Process seed str
-	cout << "Current seed string: " << seedstr << endl;
-	seed(0);
-	for (int i = 0; i < seedstr.size(); ++i)
-	{
-		uint32_t x = uint32_t(seedstr[i]);
-		x = rotate_right( (x<<24)|(x<<16)|(x<<8)|x, (i&31));
-		addseed( x ^ i );
-	}
+		po::options_description
+			opt_cmds("Allowed commands"),
+			opt_opts("Allowed options"),
+			all("Allowed options");
+		opt_cmds.add_options()
+			("help,h", "Show options\n")
+			("genbasesol,g", "Find and store base solutions")
+			;
+		if (compiled_with_cuda())
+		    opt_cmds.add_options()
+			("query,q", "Query CUDA devices")
+			("sha1bench,b", "Benchmark SHA-1 on CUDA device")
+			("cudaattack,a", "Load base solutions and perform GPU attack part")
+			;
+		opt_cmds.add_options()
+			("verifyQ60,v", "Verify Q60 solutions")
+			;
 
-	timer runtime(true);
-	
-	try {
-	switch (command)
-	{
-		case Help:
-			cout << "Usage:" << endl
-				<< "[-h|--help]              Show help" << endl
-				<< "[-g|--genbasesol]        Generate basesolutions" << endl
-				<< "[-v|--verify]            Verify 60-step solutions" << endl
-				<< "[-i|--input <file>]      Add inputfile" << endl
-				<< "[-o|--output <file>]     Set outputfile" << endl
-				<< "[-r|--rndseed <seed>]    Set seed for PRNG" << endl
-				<< "[-m|--maxbasesols <nr>]  Set max basesols to generate" << endl
-#ifndef NOCUDA
-				<< "(CUDA options)" << endl
-				<< "[-q|--query]             Query CUDA devices" << endl
-				<< "[-b|--benchmark]         Benchmark CUDA device" << endl
-				<< "[-a|--attack]            Start CUDA attack" << endl
-				<< "[-d|--device <nr>]       Sets CUDA device to use" << endl
-				<< "[-s|--cudasched <nr>]    Sets CUDA wait method: 0=auto, 1=spin, 2=yield, 3=blockingsync(default)" << endl
-				<< "[--gpublocks <nr>]       Sets number of blocks to use, -1=automatic(default)" << endl
-				<< "[--gputhreads <nr>]      Sets number of threads per block, -1=automatic(default)" << endl
-#endif
-				<< endl;
-			break;
-#ifndef NOCUDA
-		case Query:
+		opt_opts.add_options()
+			("seed,s"
+				, po::value<std::string>(&seedstr)
+				, "Set SEED string")
+			("inputfile,i"
+				, po::value<std::vector<std::string>>(&inputfile)
+				, "Inputfile(s) (may be given more than once)")
+			("outputfile,o"
+				, po::value<string>(&outputfile)
+				, "Outputfile")
+			("disablebackwardsfilter"
+				, "Disable backwards error prob. check")
+			("maxbasesols,m"
+				, po::value<int>(&max_basesols)
+				, "Stop when # basesols have been generated")
+			;
+		if (compiled_with_cuda())
+		    opt_opts.add_options()
+			("cudadevice,d"
+				, po::value<int>(&cuda_device)->default_value(0)
+				, "Set CUDA device")
+			("cudascheduler"
+				, po::value<int>(&cuda_scheduler)->default_value(3)
+				, "0=auto, 1=spin, 2=yield, 3=blockingsync")
+			("cudablocks"
+				, po::value<int>(&cuda_blocks)->default_value(-1)
+				, "Set # block to start on GPU")
+			("cudathreadsperblock"
+				, po::value<int>(&cuda_threads_per_block)->default_value(-1)
+				, "Set # threads per block to start on GPU")
+			;
+		all.add(opt_cmds).add(opt_opts);
+		po::variables_map vm;
+		po::store(po::parse_command_line(argc, argv, all), vm);
+		{
+			std::ifstream ifs("config.cfg");
+			if (ifs) po::store(po::parse_config_file(ifs,all), vm);
+		}
+		po::notify(vm);
+		disable_backwards_filter = vm.count("disablebackwardsfilter");
+
+		if (vm.count("help") 
+			|| (vm.count("query")==0 && vm.count("sha1bench")==0 && vm.count("genbasesol")==0
+				&& vm.count("cudaattack")==0 && vm.count("verifyQ60")==0))
+		{
+			cout << opt_cmds << opt_opts << endl;
+			return 0;
+		}
+
+		// Process seed str
+		cout << "Current seed string: " << seedstr << endl;
+		seed(0);
+		for (int i = 0; i < seedstr.size(); ++i)
+		{
+			uint32_t x = uint32_t(seedstr[i]);
+			x = rotate_right( (x<<24)|(x<<16)|(x<<8)|x, (i&31));
+			addseed( x ^ i );
+		}
+		if (vm.count("query"))
+		{
 			cuda_query();
-			break;
-		case Benchmark:
+		}
+		if (vm.count("sha1bench"))
+		{
 			gpusha1benchmark();
-			break;
-		case Attack:
+		}
+		if (vm.count("cudaattack"))
+		{
 			if (!inputfile.empty())
 			{
 				load_basesols(inputfile);
@@ -603,9 +541,9 @@ int main(int argc, char** argv)
 			{
 				cout << "Error: no inputfile with basesolutions given!" << endl; 
 			}
-			break;
-#endif
-		case Basesol:
+		}
+		if (vm.count("genbasesol"))
+		{
 			if (!inputfile.empty())
 			{
 				load_basesols(inputfile);
@@ -622,8 +560,9 @@ int main(int argc, char** argv)
 				}
 				start_attack(); // never returns, uses exit(0)
 			}
-			break;
-		case Verify:
+		}
+		if (vm.count("verifyQ60"))
+		{
 			if (!inputfile.empty())
 			{
 				for (size_t i = 0; i < inputfile.size(); ++i)
@@ -635,10 +574,8 @@ int main(int argc, char** argv)
 			{
 				cout << "Error: no inputfile with Q60 solutions given!" << endl;
 			}
-			break;
-		
-	} // switch(command)
-	} // try
+		}
+	}
 	catch (std::exception& e)
 	{
 		cerr << "Caught exception:" << endl << e.what() << endl;

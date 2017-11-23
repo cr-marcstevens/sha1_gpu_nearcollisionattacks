@@ -4,20 +4,28 @@
             
   This file is part of sha1freestart80 source-code and released under the MIT License
 *****/
-#include <cstring>
 
 #include "main.hpp"
 #include "neutral_bits_packing.hpp"
+#include "sha1detail.hpp"
+#include "rng.hpp"
+
+namespace cpu {
+#include "tables.hpp"
+}
+using namespace cpu;
+
+#include <cstring>
+#include <iostream>
+
+using namespace hc;
+using namespace std;
 
 /*** Bit condition masks for steps Q-4 to Q80, stored on the device in constant memory ***/
 
 // QOFF: value for Q_t is at index QOFF+t in tables below
 #define QOFF 4
 
-namespace cpu {
-#include "tables.hpp"
-}
-using namespace cpu;
 
 
 /* *** SHA1 STEP FUNCTIONS **********************************

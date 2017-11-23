@@ -1,11 +1,98 @@
-#include "main.hpp"
+#include "sha1detail.hpp"
+
+extern int cuda_device;
+
+#include <timer.hpp>
+
+#include <iostream>
 #include <iomanip>
+#include <stdexcept>
+
+using namespace std;
+using namespace hc;
 
 #define MAXBLOCKS 52
 #define MAXTHREADSPERBLOCK 1024
 #define MAXGPUTHREADS (MAXBLOCKS*MAXTHREADSPERBLOCK)
 
 #define CUDA_ASSERT(s) 	{ cudaError_t err = s; if (err != cudaSuccess) { throw std::runtime_error("CUDA command returned " + std::to_string((int)err) + ": " + string(cudaGetErrorString(err)) + "!"); }  }
+
+
+int cores_per_mp(int cc)
+{
+	switch (cc)
+	{
+		case 0x10: // TESLA G80
+		case 0x11: // TESLA G8x
+		case 0x12: // TESLA G9x
+		case 0x13: // TESLA GT200
+			return 8;
+
+		case 0x20: // FERMI GF100
+			return 32;
+		case 0x21: // FERMI GF10x
+			return 48;
+
+		case 0x30: // KEPLER GK10x
+		case 0x32: // KEPLER GK10x
+		case 0x35: // KEPLER GK11x
+		case 0x37: // KEPLER GK21x
+			return 192;
+
+		case 0x50: // MAXWELL GM10x
+		case 0x52: // MAXWELL GM20x
+		case 0x53: // MAXWELL GM20x
+			return 128;
+
+		case 0x60: // PASCAL GP100
+			return 64;
+		case 0x61: // PASCAL GP10x
+		case 0x62: // Pascal GP10x
+			return 128;
+
+		case 0x70: // VOLTA GV100
+			return 64;
+		default: // unknown
+			return -1;
+	}
+}
+
+void cuda_query()
+{
+	cout << "======== CUDA DEVICE QUERY ======== " << endl;
+	int devicecount = 0;
+	CUDA_ASSERT( cudaGetDeviceCount(&devicecount) );
+	cout << "Detected " << devicecount << " CUDA Capable device(s)." << endl;
+	for (int dev = 0; dev < devicecount; ++dev)
+	{
+		cudaSetDevice(dev);
+		cudaDeviceProp prop;
+		cudaGetDeviceProperties(&prop, dev);
+		cout << "======== device " << dev << " : " << prop.name << " ========" << endl;
+		int driverversion, runtimeversion;
+		cudaDriverGetVersion(&driverversion);
+		cudaRuntimeGetVersion(&runtimeversion);
+		cout << "CUDA Driver       : " << (driverversion/1000) << "." << (driverversion%100)/10 << endl;
+		cout << "CUDA Runtime      : " << (runtimeversion/1000) << "." << (runtimeversion%100)/10 << endl;
+		cout << "CUDA Capability   : " << prop.major << "." << prop.minor << endl;
+		cout << "Global memory     : " << prop.totalGlobalMem << " bytes" << endl;
+		cout << "Cores             : " << prop.multiProcessorCount << " MP x "
+			<< cores_per_mp((prop.major<<4)+prop.minor) << " cores/MP = "
+			<< prop.multiProcessorCount*cores_per_mp((prop.major<<4)+prop.minor) << " cores" << endl;
+		cout << "Clock rate        : " << prop.clockRate * 1e-3f << " MHz" << endl;
+		cout << "Constant mem      : " << prop.totalConstMem << " bytes" << endl;
+		cout << "Shared mem/Block  : " << prop.sharedMemPerBlock << " bytes" << endl;
+		cout << "Registers /Block  : " << prop.regsPerBlock << endl;
+		cout << "MaxThreads/MP     : " << prop.maxThreadsPerMultiProcessor << endl;
+		cout << "MaxThreads/Block  : " << prop.maxThreadsPerBlock << endl;
+		cout << "Runtime limit     : " << (prop.kernelExecTimeoutEnabled?"YES":"NO") << endl;
+		cout << "Unified Addressing: " << (prop.unifiedAddressing?"YES":"NO") << endl;
+		cout << endl;
+	}
+}
+
+
+
 
 
 __device__ __constant__	const uint32_t sha1_iv2[] = { 0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476, 0xC3D2E1F0 };
@@ -644,7 +731,7 @@ void gpusha1benchmark()
 	CUDA_ASSERT( cudaGetDeviceProperties(&prop, cuda_device) );
 	cout << prop.name << " (PCI " << hex << setw(2) << setfill('0') << prop.pciBusID << ":" << hex << setw(2) << setfill('0') << prop.pciDeviceID << "." << hex << prop.pciDomainID << dec << ")" << endl;
 
-	timer sw;
+	timer::timer sw;
 	uint32_t count = 1;
 	double mintime = 0;
 	do {

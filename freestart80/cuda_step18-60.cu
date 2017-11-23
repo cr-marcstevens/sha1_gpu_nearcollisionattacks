@@ -42,15 +42,23 @@
 
 #include "main.hpp"
 #include "neutral_bits_packing.hpp"
+#include "sha1detail.hpp"
+
 #include <cuda_cyclicbuffer.hpp>
 
+#include <timer.hpp>
+
+#include <cuda.h>
+#include <cuda_runtime.h>
+
 #include <map>
+#include <iostream>
 #include <fstream>
 #include <iomanip>
 #include <stdexcept>
 
-#include <cuda.h>
-#include <cuda_runtime.h>
+using namespace hc;
+using namespace std;
 
 #define CUDA_ASSERT(s) 	{ cudaError_t err = s; if (err != cudaSuccess) { throw std::runtime_error("CUDA command returned: " + string(cudaGetErrorString(err)) + "!"); }  }
 
@@ -2025,7 +2033,10 @@ control_basesol_t basesol_ctl_host;
 
 
 
-
+bool compiled_with_cuda()
+{
+	return true;
+}
 
 void cuda_main(std::vector<basesol_t>& basesols)
 {
@@ -2153,12 +2164,12 @@ void cuda_main(std::vector<basesol_t>& basesols)
 
 
 	cout << "Starting CUDA kernel" << flush;
-	hc::timer cuda_total_time(true);
+	timer::timer cuda_total_time;
 	while (true)
 	{
 		cout << "." << flush;
 
-		hc::timer cuda_time(true);
+		timer::timer cuda_time;
 		cuda_attack<<<cuda_blocks,cuda_threads_per_block>>>();
 		CUDA_ASSERT( cudaDeviceSynchronize() );
 		cout << "CUDA running time: " << cuda_time.time() << endl;
@@ -2264,71 +2275,6 @@ void cuda_main(std::vector<basesol_t>& basesols)
 
 
 
-
-
-
-
-
-
-
-
-
-int cores_per_mp(int cc)
-{
-	switch (cc)
-	{
-		case 0x10: // TESLA G80
-		case 0x11: // TESLA G8x
-		case 0x12: // TESLA G9x
-		case 0x13: // TESLA GT200
-			return 8;
-		case 0x20: // FERMI GF100
-			return 32;
-		case 0x21: // FERMI GF10x
-			return 48;
-		case 0x30: // KEPLER GK10x
-		case 0x32: // KEPLER GK10x
-		case 0x35: // KEPLER GK11x
-		case 0x37: // KEPLER GK21x
-			return 192;
-		case 0x50: // MAXWELL GM10x
-		case 0x52: // MAXWELL GM20x
-			return 128;
-		default: // unknown
-			return -1;
-	}
-}
-void cuda_query()
-{
-	cout << "======== CUDA DEVICE QUERY ======== " << endl;
-	int devicecount = 0;
-	CUDA_ASSERT( cudaGetDeviceCount(&devicecount) );
-	cout << "Detected " << devicecount << " CUDA Capable device(s)." << endl;
-	for (int dev = 0; dev < devicecount; ++dev)
-	{
-		cudaSetDevice(dev);
-		cudaDeviceProp prop;
-		cudaGetDeviceProperties(&prop, dev);
-		cout << "======== device " << dev << " : " << prop.name << " ========" << endl;
-		int driverversion, runtimeversion;
-		cudaDriverGetVersion(&driverversion);
-		cudaRuntimeGetVersion(&runtimeversion);
-		cout << "CUDA Driver       : " << (driverversion/1000) << "." << (driverversion%100)/10 << endl;
-		cout << "CUDA Runtime      : " << (runtimeversion/1000) << "." << (runtimeversion%100)/10 << endl;
-		cout << "CUDA Capability   : " << prop.major << "." << prop.minor << endl;
-		cout << "Global memory     : " << prop.totalGlobalMem << " bytes" << endl;
-		cout << "Cores             : " << prop.multiProcessorCount << " MP x " << cores_per_mp((prop.major<<4)+prop.minor) << " cores/MP = " << prop.multiProcessorCount*cores_per_mp((prop.major<<4)+prop.minor) << " cores" << endl;
-		cout << "Clock rate        : " << prop.clockRate * 1e-3f << " MHz" << endl;
-		cout << "Constant mem      : " << prop.totalConstMem << " bytes" << endl;
-		cout << "Shared mem/Block  : " << prop.sharedMemPerBlock << " bytes" << endl;
-		cout << "Registers /Block  : " << prop.regsPerBlock << endl;
-		cout << "MaxThreads/MP     : " << prop.maxThreadsPerMultiProcessor << endl;
-		cout << "MaxThreads/Block  : " << prop.maxThreadsPerBlock << endl;
-		cout << "Runtime limit     : " << (prop.kernelExecTimeoutEnabled?"YES":"NO") << endl;
-		cout << "Unified Addressing: " << (prop.unifiedAddressing?"YES":"NO") << endl;
-		cout << endl;
-	}
-}
 
 
 

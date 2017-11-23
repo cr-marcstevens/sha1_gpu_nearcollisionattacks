@@ -1,15 +1,26 @@
+#include "main.hpp"
+
+namespace maincpp {
+#include "tables.hpp"
+}
+using namespace maincpp;
+
+#include "sha1detail.hpp"
+#include "rng.hpp"
+
+#include <program_options.hpp>
+#include <timer.hpp>
+
 #include <fstream>
 #include <iomanip>
 #include <thread>
-#include <program_options.hpp>
 #include <chrono>
 #include <mutex>
 #include <cstdio>
 #include <algorithm>
 
-#include "main.hpp"
-
 using namespace hc;
+using namespace std;
 namespace po = program_options;
 
 int cuda_device, cuda_blocks, cuda_threads_per_block;
@@ -17,12 +28,8 @@ vector<string> inputfile;
 string outputfile;
 bool disable_backwards_filter = false;
 int cuda_scheduler;
-
+int max_basesols;
  
-namespace maincpp {
-#include "tables.hpp"
-}
-using namespace maincpp;
 
 
 
@@ -641,46 +648,26 @@ void found_basesol(uint32_t main_m1[80], uint32_t main_Q1[85], unsigned mainbloc
 		{
 			cout << "{" << basesols.size() << "}" << flush;
 		}
-	}
-}
-
-#define W14NBALLM 0x00003FE0
-#define W15NBALLM 0x00017FE0
-#define W16NBALLM 0x00012FC0
-#define W17NBALLM 0x00083C00
-#define W18NBALLM 0x00018000
-#define W19NBALLM 0x00005FC0
-#define W20NBALLM 0x00003841
-#define W21NBALLM 0x00030800
-int localize_bitrel_conditions(int bitrel)
-{
-	uint32_t nbs[8] = {W14NBALLM, W15NBALLM, W16NBALLM, W17NBALLM, W18NBALLM, W19NBALLM, W20NBALLM, W21NBALLM};
-
-
-	int nokay = 0;
-	for (int i = 14; i < 22; i++)
-	{
-		if (msgbitrels80[bitrel][i] & nbs[i - 14])
+		if (max_basesols > 0 && basesols.size() == max_basesols)
 		{
-			nokay = 1;
-			fprintf(stderr, "Message bitrel %d conflicting with neutral bits on m%d\n", bitrel, i);
+			if (!outputfile.empty())
+				save_basesols(outputfile);
+			exit(0);
 		}
 	}
-
-	return nokay;
 }
 
-///////////////////////////////////////////////////////////
 
 
 
 int main(int argc, char** argv)
 {
 
-	timer runtime(true);
-//	try 
-//	{
+	timer::timer runtime;
+	try 
+	{
 		uint64_t seedval = (uint64_t(xrng128())<<32) | uint64_t(xrng128());
+		max_basesols = 0;
 
 		po::options_description
 			opt_cmds("Allowed commands"),
@@ -688,43 +675,49 @@ int main(int argc, char** argv)
 			all("Allowed options");
 		opt_cmds.add_options()
 			("help,h",        "Show options\n")
-#ifndef NOCUDA
+			("genbasesol,g",  "Find and store base solutions")
+			;
+		if (compiled_with_cuda())
+		    opt_cmds.add_options()
 			("query,q",       "Query CUDA devices")
 			("sha1bench,b",   "Benchmark SHA-1 on CUDA device")
-#endif
-			("findbasesol,f", "Find and store base solutions")
-#ifndef NOCUDA
 			("cudaattack,a",  "Load base solutions and do neutral bits in CUDA")
-#endif
-			("cpuattack,c",     "Load base solutions and do neutral bits on CPU")
-			("verifyQ56,v",     "Verify Q56 solutions (Q56-based)")
-			("verifyQ56old",     "Verify Q56 solutions (Q36-based)")
-			("verifyBitrel,n",     "Verify neutral bits and bit relations")
+			;
+		opt_cmds.add_options()
+//			("cpuattack,c",     "Load base solutions and do neutral bits on CPU")
+			("verifyQ56,v",     "Verify Q56 solutions") // new: stored as Q56-state
+//			("verifyQ56old",     "Verify Q56 solutions (Q36-state)") // old: stored as Q36-state
 			;
 		opt_opts.add_options()
-			("device,d"
+			("seed,s"
+				, po::value<uint64_t>(&seedval)
+				, "Set SEED value")
+			("inputfile,i"
+				, po::value<vector< string> >(&inputfile)
+				, "Inputfile(s) (may be given more than once)")
+			("outputfile,o"
+				, po::value<string>(&outputfile)
+				, "Outputfile")
+			("disablebackwardsfilter"
+				, "Disable backwards error prob. check")
+			("maxbasesols,m"
+				, po::value<int>(&max_basesols)
+				, "Stop when # basesols have been generated")
+			;
+		if (compiled_with_cuda())
+		    opt_opts.add_options()
+			("cudadevice,d"
 				, po::value<int>(&cuda_device)->default_value(0)
 				, "Set CUDA device")
 			("cudascheduler"
 				, po::value<int>(&cuda_scheduler)->default_value(3)
 				, "0=auto, 1=spin, 2=yield, 3=blockingsync")
-			("gpublocks"
+			("cudablocks"
 				, po::value<int>(&cuda_blocks)->default_value(-1)
 				, "Set # blocks to start on GPU")
-			("gputhreadsperblock"
+			("cudathreadsperblock"
 				, po::value<int>(&cuda_threads_per_block)->default_value(-1)
 				, "Set # threads per block to start on GPU")
-			("seed,s"
-				, po::value<uint64_t>(&seedval)
-				, "Set SEED value")
-			("outputfile,o"
-				, po::value<string>(&outputfile)
-				, "Outputfile")
-			("inputfile,i"
-				, po::value<vector< string> >(&inputfile)
-				, "Inputfile(s) (may be given more than once)")
-			("disablebackwardsfilter"
-				, "Disable backwards error prob. check under neutral bit changes")
 			;
 		all.add(opt_cmds).add(opt_opts);
 		po::variables_map vm;
@@ -734,27 +727,25 @@ int main(int argc, char** argv)
 			if (ifs) po::store(po::parse_config_file(ifs,all), vm);
 		}
 		po::notify(vm);
+		disable_backwards_filter = vm.count("disablebackwardsfilter");
 
 
-		if (vm.count("help") || (vm.count("query")==0 && vm.count("sha1bench")==0 && vm.count("findbasesol")==0 && vm.count("cudaattack")==0 && vm.count("cpuattack")==0 && vm.count("verifyQ56")==0 && vm.count("verifyBitrel") == 0 && vm.count("verifyQ56old")==0))
+		if (vm.count("help") 
+			|| (vm.count("query")==0 && vm.count("sha1bench")==0 && vm.count("genbasesol")==0 
+				&& vm.count("cudaattack")==0 && vm.count("cpuattack")==0 
+				&& vm.count("verifyQ56")==0 && vm.count("verifyQ56old")==0))
 		{
 			cout << opt_cmds << opt_opts << endl;
 			return 0;
 		}
-		if (vm.count("disablebackwardsfilter"))
-		{
-			disable_backwards_filter = true;
-		}
-
 		// process seed for activities that need them
-		if (vm.count("findbasesol"))
+		if (vm.count("genbasesol"))
 		{
 			cout << "Using seed " << seedval << "." << endl;
 			seed( uint32_t(seedval&0xFFFFFFFF) );
 			addseed( uint32_t(seedval>>32) );
 		}
 
-#ifndef NOCUDA
 		if (vm.count("query"))
 		{
 			cuda_query();
@@ -763,8 +754,7 @@ int main(int argc, char** argv)
 		{
 			gpusha1benchmark();
 		}
-#endif
-		if (vm.count("findbasesol"))
+		if (vm.count("genbasesol"))
 		{
 			load_basesols(inputfile);
 			if (!basesols.empty())
@@ -788,7 +778,6 @@ int main(int argc, char** argv)
 				}
 			}
 		}
-#ifndef NOCUDA
 		if (vm.count("cudaattack"))
 		{
 			if (vm.count("inputfile"))
@@ -801,7 +790,6 @@ int main(int argc, char** argv)
 				cout << "Error: no inputfile with basesolutions given!" << endl; 
 			}
 		}
-#endif
 		if (vm.count("cpuattack"))
 		{
 			if (vm.count("inputfile"))
@@ -842,21 +830,11 @@ int main(int argc, char** argv)
 				cout << "Error: no inputfile with Q56 solutions given!" << endl;
 			}
 		}
-		if (vm.count("verifyBitrel"))
-		{
-			int count = 0;
-			for (int i = 0; i < msgbitrels80_size; i++)
-			{
-				fprintf(stderr, "--- %d ---\n", i);
-				count += localize_bitrel_conditions(i);
-			}
-			fprintf(stderr, "\n%d conflicts in total\n", count);
-		}
-//	}
-//	catch (std::exception& e)
-//	{
-//		cerr << "Caught exception:" << endl << e.what() << endl;
-//	}
+	}
+	catch (std::exception& e)
+	{
+		cerr << "Caught exception:" << endl << e.what() << endl;
+	}
 	cout << "Runtime: " << runtime.time() << endl;
 	return 0;
 }
