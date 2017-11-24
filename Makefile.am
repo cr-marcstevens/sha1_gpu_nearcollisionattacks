@@ -8,10 +8,12 @@ AM_CPPFLAGS=-I$(top_srcdir)/lib -I$(top_srcdir)/contrib
 noinst_LIBRARIES=lib/libutil.a
 
 EXTRA_PROGRAMS=\
-	bin/sha1_freestart76_basesolgen \
-	bin/sha1_freestart76_gpuattack \
-	bin/sha1_freestart80_basesolgen \
-	bin/sha1_freestart80_gpuattack
+	bin/freestart76_basesolgen \
+	bin/freestart76_gpuattack \
+	bin/freestart80_basesolgen \
+	bin/freestart80_gpuattack \
+	bin/shatterednc2_basesolgen \
+	bin/shatterednc2_gpuattack
 
 
 
@@ -27,7 +29,7 @@ lib_libutil_a_SOURCES=\
 
 
 
-bin_sha1_freestart76_gpuattack_SOURCES=\
+bin_freestart76_gpuattack_SOURCES=\
 	freestart76/main.cpp freestart76/main.hpp \
 	freestart76/tables.hpp \
 	freestart76/find_basesols.cpp \
@@ -35,53 +37,79 @@ bin_sha1_freestart76_gpuattack_SOURCES=\
 	freestart76/cuda_step18-56.cu \
 	lib/sha1benchmark.cu
 
-bin_sha1_freestart76_gpuattack_LDADD=lib/libutil.a $(CUDA_LIBS)
+bin_freestart76_gpuattack_LDADD=lib/libutil.a $(CUDA_LIBS)
 
-bin_sha1_freestart76_basesolgen_SOURCES=\
+bin_freestart76_basesolgen_SOURCES=\
 	freestart76/main.cpp freestart76/main.hpp \
 	freestart76/tables.hpp \
 	freestart76/find_basesols.cpp \
 	freestart76/cpu_step18-56.cpp \
 	lib/cuda_dummy.cpp
 
-bin_sha1_freestart76_basesolgen_LDADD=lib/libutil.a $(CUDA_LIBS)
+bin_freestart76_basesolgen_LDADD=lib/libutil.a
 
-freestart76: bin/sha1_freestart76_gpuattack bin/sha1_freestart76_basesolgen
+freestart76: bin/freestart76_gpuattack bin/freestart76_basesolgen
 
 
 
-bin_sha1_freestart80_gpuattack_SOURCES=\
+bin_freestart80_gpuattack_SOURCES=\
 	freestart80/main.cpp freestart80/main.hpp \
 	freestart80/tables.hpp \
+	freestart80/neutral_bits_packing.hpp \
 	freestart80/find_basesols.cpp \
 	freestart80/cpu_step18-60.cpp \
 	freestart80/cuda_step18-60.cu \
 	lib/sha1benchmark.cu
 
-bin_sha1_freestart80_gpuattack_LDADD=lib/libutil.a $(CUDA_LIBS)
+bin_freestart80_gpuattack_LDADD=lib/libutil.a $(CUDA_LIBS)
 
-bin_sha1_freestart80_basesolgen_SOURCES=\
+bin_freestart80_basesolgen_SOURCES=\
 	freestart80/main.cpp freestart80/main.hpp \
 	freestart80/tables.hpp \
+	freestart80/neutral_bits_packing.hpp \
 	freestart80/find_basesols.cpp \
 	freestart80/cpu_step18-60.cpp \
 	lib/cuda_dummy.cpp
 
-bin_sha1_freestart80_basesolgen_LDADD=lib/libutil.a $(CUDA_LIBS)
+bin_freestart80_basesolgen_LDADD=lib/libutil.a
 
-freestart80: bin/sha1_freestart80_gpuattack bin/sha1_freestart80_basesolgen
+freestart80: bin/freestart80_gpuattack bin/freestart80_basesolgen
 
 
 
-#ifeq ($(GENCODE_FLAGS),)
+bin_shatterednc2_gpuattack_SOURCES=\
+	shattered_nc2/main.cpp shattered_nc2/main.hpp \
+	shattered_nc2/tables_org.hpp \
+	shattered_nc2/tables_wQ14nb.hpp \
+	shattered_nc2/tables_wQ17nb.hpp \
+	shattered_nc2/tables_wboom.hpp \
+	shattered_nc2/neutral_bits_packing.hpp \
+	shattered_nc2/find_basesols.cpp \
+	shattered_nc2/cuda_step14-60.cu \
+	lib/sha1benchmark.cu
+
+bin_shatterednc2_gpuattack_LDADD=lib/libutil.a $(CUDA_LIBS)
+
+bin_shatterednc2_basesolgen_SOURCES=\
+	shattered_nc2/main.cpp shattered_nc2/main.hpp \
+	shattered_nc2/tables_org.hpp \
+	shattered_nc2/tables_wQ14nb.hpp \
+	shattered_nc2/tables_wQ17nb.hpp \
+	shattered_nc2/tables_wboom.hpp \
+	shattered_nc2/neutral_bits_packing.hpp \
+	shattered_nc2/find_basesols.cpp \
+	lib/cuda_dummy.cpp
+
+bin_shatterednc2_basesolgen_LDADD=lib/libutil.a
+
+shatterednc2: bin/shatterednc2_gpuattack bin/shatterednc2_basesolgen
+
+
+#### CUDA Makefile rules ####
 GENCODE_FLAGS=
 $(foreach sm,$(CUDA_SMS),$(eval GENCODE_FLAGS += -gencode arch=compute_$(sm),code=sm_$(sm)))
 HIGHEST_SM:=$(lastword $(sort $(CUDA_SMS)))
-#ifneq ($(HIGHEST_SM),)
 GENCODE_FLAGS+=-gencode arch=compute_$(HIGHEST_SM),code=compute_$(HIGHEST_SM)
-#endif
-#endif
-
 
 NVCCFLAGS=-ccbin $(CXX) -O2 --maxrregcount=64 --ptxas-options=-v -Xcompiler -mcmodel=medium
 

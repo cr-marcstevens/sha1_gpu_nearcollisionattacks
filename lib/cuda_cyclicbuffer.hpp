@@ -237,7 +237,8 @@ class cyclic_buffer_mask_t
 	__host__ __device__ inline void write(control_t& control, bool dowrite
 		, val_t _val0   , val_t _val1 =0, val_t _val2 =0, val_t _val3 =0, val_t _val4 =0, val_t _val5 =0, val_t _val6 =0, val_t _val7 =0, val_t _val8 =0, val_t _val9 =0
 		, val_t _val10=0, val_t _val11=0, val_t _val12=0, val_t _val13=0, val_t _val14=0, val_t _val15=0, val_t _val16=0, val_t _val17=0, val_t _val18=0, val_t _val19=0
-		, val_t _val20=0, val_t _val21=0
+		, val_t _val20=0, val_t _val21=0, val_t _val22=0, val_t _val23=0, val_t _val24=0, val_t _val25=0, val_t _val26=0, val_t _val27=0, val_t _val28=0, val_t _val29=0
+		, val_t _val30=0, val_t _val31=0
 		)
 	{
 #ifdef __CUDA_ARCH__
@@ -276,6 +277,16 @@ class cyclic_buffer_mask_t
 			cond_write(wi, _val19, pred_t<19>());
 			cond_write(wi, _val20, pred_t<20>());
 			cond_write(wi, _val21, pred_t<21>());
+			cond_write(wi, _val22, pred_t<22>());
+			cond_write(wi, _val23, pred_t<23>());
+			cond_write(wi, _val24, pred_t<24>());
+			cond_write(wi, _val25, pred_t<25>());
+			cond_write(wi, _val26, pred_t<26>());
+			cond_write(wi, _val27, pred_t<27>());
+			cond_write(wi, _val28, pred_t<28>());
+			cond_write(wi, _val29, pred_t<29>());
+			cond_write(wi, _val30, pred_t<30>());
+			cond_write(wi, _val31, pred_t<31>());
 #ifdef __CUDA_ARCH__
 			memoryfence<fencetype>();
 #endif
@@ -518,8 +529,8 @@ class cyclic_buffer_cas_t
 	__host__ __device__ inline void write(control_t& control, bool dowrite
 		, val_t _val0   , val_t _val1 =0, val_t _val2 =0, val_t _val3 =0, val_t _val4 =0, val_t _val5 =0, val_t _val6 =0, val_t _val7 =0, val_t _val8 =0, val_t _val9 =0
 		, val_t _val10=0, val_t _val11=0, val_t _val12=0, val_t _val13=0, val_t _val14=0, val_t _val15=0, val_t _val16=0, val_t _val17=0, val_t _val18=0, val_t _val19=0
-		, val_t _val20=0, val_t _val21=0 
-		/*, val_t _val22=0, val_t _val23=0, val_t _val24=0, val_t _val25=0, val_t _val26=0, val_t _val27=0, val_t _val28=0, val_t _val29=0 */
+		, val_t _val20=0, val_t _val21=0, val_t _val22=0, val_t _val23=0, val_t _val24=0, val_t _val25=0, val_t _val26=0, val_t _val27=0, val_t _val28=0, val_t _val29=0
+		, val_t _val30=0, val_t _val31=0
 		)
 	{
 #ifdef __CUDA_ARCH__
@@ -558,6 +569,16 @@ class cyclic_buffer_cas_t
 			cond_write(wi, _val19, pred_t<19>());
 			cond_write(wi, _val20, pred_t<20>());
 			cond_write(wi, _val21, pred_t<21>());
+			cond_write(wi, _val22, pred_t<22>());
+			cond_write(wi, _val23, pred_t<23>());
+			cond_write(wi, _val24, pred_t<24>());
+			cond_write(wi, _val25, pred_t<25>());
+			cond_write(wi, _val26, pred_t<26>());
+			cond_write(wi, _val27, pred_t<27>());
+			cond_write(wi, _val28, pred_t<28>());
+			cond_write(wi, _val29, pred_t<29>());
+			cond_write(wi, _val30, pred_t<30>());
+			cond_write(wi, _val31, pred_t<31>());
 #ifdef __CUDA_ARCH__
 			memoryfence<fencetype>();
 		}

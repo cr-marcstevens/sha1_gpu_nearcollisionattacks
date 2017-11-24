@@ -30,3 +30,21 @@
 *.exe
 *.out
 *.app
+
+# autotools generated files
+Makefile
+Makefile.in
+aclocal.m4
+autom4te.cache/
+build-aux/
+config.*
+configure
+*/.deps/
+*/.dirstamp
+m4/libtool.m4
+m4/lt*.m4
+stamp-h1
+libtool
+
+# building files
+bin/

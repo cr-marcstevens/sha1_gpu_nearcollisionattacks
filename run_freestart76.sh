@@ -1,8 +1,17 @@
 #!/bin/bash
 
 export BINDIR=$(dirname $0)/bin
-export BASESOLGEN=$BINDIR/sha1_freestart76_basesolgen
-export GPUATTACK=$BINDIR/sha1_freestart76_gpuattack
+export BASESOLGEN=$BINDIR/freestart76_basesolgen
+export GPUATTACK=$BINDIR/freestart76_gpuattack
+
+if [ ! -x $BASESOLGEN ]; then
+	echo "Cannot find freestart76_basesolgen in $BINDIR"
+	exit 1
+fi
+if [ ! -x $GPUATTACK ]; then
+	echo "Cannot find freestart76_gpuattack in $BINDIR"
+	exit 1
+fi
 
 echo "Generating basesolutions for 4 minutes..."
 # Generate base solutions for 4 minutes
@@ -19,7 +28,7 @@ for ((i=4; i>=0; --i)); do
 done
 
 sleep 5
-killall sha1_freestart76_basesolgen
+killall freestart76_basesolgen
 
 # Loop: run GPU attack on available basesolutions, meanwhile generate new basesolutions
 for ((i=1;;++i)); do
@@ -52,7 +61,7 @@ for ((i=1;;++i)); do
 	# check for freestart collision
 	$BASESOLGEN -v -i fs76_q56_$i.bin > fs76_q56_$i.log
 	if grep "Found solution" -A52 -B80 fs76_q56_$i.log ; then
-		killall sha1_freestart76_basesolgen
+		killall freestart76_basesolgen
 		exit 0
 	fi
 	
@@ -61,5 +70,5 @@ for ((i=1;;++i)); do
 	rm -f basesol76.20min.timer
 	
 	# kill background generation of basesolutions
-	killall sha1_freestart76_basesolgen
+	killall freestart76_basesolgen
 done

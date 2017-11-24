@@ -3,8 +3,13 @@
 #include <vector>
 
 struct basesol_t {
-uint32_t Q[6];  // Q12,..,Q17
-uint32_t m[16]; // W6,...,W21
+uint32_t Q[6];
+uint32_t m[16];
+};
+
+struct q14sol_t {
+uint32_t Q[16]; 
+uint32_t m[16];
 };
 
 bool compiled_with_cuda()
@@ -18,6 +23,11 @@ void cuda_query()
 }
 
 void cuda_main(std::vector<basesol_t>& basesols)
+{
+	std::cerr << "cuda_main(): not compiled for non-CUDA basesolution generator program" << std::endl;
+}
+
+void cuda_main(std::vector<q14sol_t>& q14sols)
 {
 	std::cerr << "cuda_main(): not compiled for non-CUDA basesolution generator program" << std::endl;
 }
