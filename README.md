@@ -24,6 +24,8 @@
 
  - `../run_freestart76.sh`
 
+ - (Hint: use `--seed 4_23_152443400808031284 --maxbasesols 262144` for basesol generation)
+
 # Find your own 80-round SHA-1 freestart collision
 
  - Expected GPU runtime: *640 days* on a single GTX-970
