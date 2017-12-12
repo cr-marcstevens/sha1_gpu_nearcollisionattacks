@@ -109,6 +109,7 @@ bin_shatterednc2_basesolgen_SOURCES=\
 bin_shatterednc2_basesolgen_LDADD=lib/libutil.a
 
 shatterednc2: bin/shatterednc2_gpuattack bin/shatterednc2_basesolgen
+shattered_nc2: bin/shatterednc2_gpuattack bin/shatterednc2_basesolgen
 
 
 #### CUDA Makefile rules ####

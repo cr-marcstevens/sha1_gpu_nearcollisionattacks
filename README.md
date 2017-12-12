@@ -17,7 +17,8 @@ This repository contains the source code belonging to three scientific publicati
 - *The first collision for full SHA-1*, Marc Stevens, Elie Bursztein, Pierre Karpman, Ange Albertini, Yarik Markov, CRYPTO 2017, Lecture Notes in Computer Science, vol. 10401, Springer, 2017, pp. 570-596.
 
   This publication presents a complete collision attack on full SHA-1 and further improvements of cryptanalytic tools. The majority of the runtime cost is roughly 102 years on 1 NVIDIA GTX-970 GPU and was executed on a distributed GPU system of Google. 
-  Note that only the second near-collision attack was implemented for GPU and is released here. The first near-collision attack of this project was already published in EUROCRYPT 2013 and is available at https://github.com/cr-marcstevens/hashclash.
+  Note that only the second near-collision attack was implemented for GPU and is released here without the changes to adapt it to Google's proprietary build and job systems. 
+  The first near-collision attack of this project was already published in EUROCRYPT 2013 and is available at https://github.com/cr-marcstevens/hashclash.
 
   See also https://shattered.it
 
