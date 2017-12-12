@@ -4,17 +4,17 @@
 
 This repository contains the source code belonging to three scientific publications:
 
-- *Practical free-start collision attacks on 76-step SHA-1*, Pierre Karpman, Thomas Peyrin, and Marc Stevens, CRYPTO 2015, Lecture Notes in Computer Science, vol. 9215, Springer, 2015, pp. 623-642.
+- [*Practical free-start collision attacks on 76-step SHA-1*](https://eprint.iacr.org/2015/530), Pierre Karpman, Thomas Peyrin, and Marc Stevens, CRYPTO 2015, Lecture Notes in Computer Science, vol. 9215, Springer, 2015, pp. 623-642.
 
   This publication introduces the efficient GPU framework for SHA-1 collision finding, improvements of cryptanalytic tools, and a freestart attack on 76-step SHA-1. The runtime cost is roughly 5 days on 1 NVIDIA GTX-970 GPU and was executed on the GPU cluster of Thomas Peyrin.
 
-- *Freestart collision for full SHA-1*, Marc Stevens, Pierre Karpman, Thomas Peyrin, EUROCRYPT 2016, Lecture Notes in Computer Science, vol. 9665, Springer, 2016, pp. 459-483.
+- [*Freestart collision for full SHA-1*](https://eprint.iacr.org/2015/967), Marc Stevens, Pierre Karpman, Thomas Peyrin, EUROCRYPT 2016, Lecture Notes in Computer Science, vol. 9665, Springer, 2016, pp. 459-483.
 
   This publication introduces a freestart attack on 80-step SHA-1, further improvements of cryptanalytic tools, and presents a cost analysis for a (normal) collision attack for full SHA-1. The runtime cost is roughly 640 days on 1 NVIDIA GTX-970 GPU and was executed on the GPU cluster of Thomas Peyrin.
   
   See also https://sites.google.com/site/itstheshappening/
 
-- *The first collision for full SHA-1*, Marc Stevens, Elie Bursztein, Pierre Karpman, Ange Albertini, Yarik Markov, CRYPTO 2017, Lecture Notes in Computer Science, vol. 10401, Springer, 2017, pp. 570-596.
+- [*The first collision for full SHA-1*](https://eprint.iacr.org/2017/190), Marc Stevens, Elie Bursztein, Pierre Karpman, Ange Albertini, Yarik Markov, CRYPTO 2017, Lecture Notes in Computer Science, vol. 10401, Springer, 2017, pp. 570-596.
 
   This publication presents a complete collision attack on full SHA-1 and further improvements of cryptanalytic tools. The majority of the runtime cost is roughly 102 years on 1 NVIDIA GTX-970 GPU and was executed on a distributed GPU system of Google. 
   Note that only the second near-collision attack was implemented for GPU and is released here without the changes to adapt it to Google's proprietary build and job systems. 
