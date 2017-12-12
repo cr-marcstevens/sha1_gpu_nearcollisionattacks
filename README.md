@@ -46,7 +46,13 @@ This repository contains the source code belonging to three scientific publicati
 
  - `../run_freestart76.sh`
 
- - (Hint: use `--seed 4_23_152443400808031284 --maxbasesols 262144` for basesol generation)
+ - Example manual usage tools:
+ 
+   - `bin/freestart76_basesolgen --genbasesol --seed 4_23_152443400808031284 --maxbasesols 262144 -o fs76_basesols.bin`
+   
+   - `bin/freestart76_gpuattack --cudaattack -i fs76_basesols.bin -o fs76_q56sols.bin`
+   
+   - `bin/freestart76_basesolgen --verifyQ56 -i fs76_q56sols.bin | grep Found -B88 -A52`
 
 ## Find your own 80-round SHA-1 freestart collision
 
