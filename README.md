@@ -1,4 +1,4 @@
-# sha1_gpu_nearcollisionattacks
+# SHA-1 GPU near-collision attacks
 
 ## Publications
 
@@ -29,7 +29,7 @@ This repository contains the source code belonging to three scientific publicati
 
  - autotools
 
-# Building
+## Building
 
  - `autoreconf --install`
 
@@ -37,7 +37,7 @@ This repository contains the source code belonging to three scientific publicati
 
  - `make`
 
-# Find your own 76-round SHA-1 freestart collision
+## Find your own 76-round SHA-1 freestart collision
 
  - Expected GPU runtime: *5 days* on a single GTX-970
 
@@ -47,7 +47,7 @@ This repository contains the source code belonging to three scientific publicati
 
  - (Hint: use `--seed 4_23_152443400808031284 --maxbasesols 262144` for basesol generation)
 
-# Find your own 80-round SHA-1 freestart collision
+## Find your own 80-round SHA-1 freestart collision
 
  - Expected GPU runtime: *640 days* on a single GTX-970
 
@@ -59,7 +59,7 @@ This repository contains the source code belonging to three scientific publicati
 
  `bin/freestart80_gpuattack -a -i basesol80_1.txt`
 
-# Find your own shattered 2nd near-collision block pair
+## Find your own shattered 2nd near-collision block pair
 
  - Expected GPU runtime: *102 years* on a single GTX-970
 
