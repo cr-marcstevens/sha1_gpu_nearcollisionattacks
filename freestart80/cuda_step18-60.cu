@@ -1,8 +1,8 @@
 /*****
-  Copyright (C) 2016 Marc Stevens, Centrum Wiskunde & Informatica (CWI), Amsterdam.
-            (C) 2016 Pierre Karpman
+  Copyright (C) 2015 Marc Stevens, Centrum Wiskunde & Informatica (CWI), Amsterdam.
+            (C) 2015 Pierre Karpman, INRIA France/Nanyang Technological University Singapore (-2016), CWI (2016/2017), L'Universite Grenoble Alpes (2017-)
 
-  This file is part of sha1freestart80 source-code and released under the MIT License
+  This file is part of sha1_gpu_nearcollisionattacks source-code and released under the MIT License
 *****/
 
 /************ TODO TODO **********\
@@ -57,7 +57,7 @@
 #include <iomanip>
 #include <stdexcept>
 
-using namespace hc;
+using namespace hashclash;
 using namespace std;
 
 #define CUDA_ASSERT(s) 	{ cudaError_t err = s; if (err != cudaSuccess) { throw std::runtime_error("CUDA command returned: " + string(cudaGetErrorString(err)) + "!"); }  }
@@ -2532,7 +2532,7 @@ bool verify_Q20(int block, size_t read_idx)
 		{
 			w ^= m[t] & msgbitrels16[r][t - mainblockoffset];
 		}
-		if (0 != (hc::hw(w) & 1))
+		if (0 != (hashclash::hw(w) & 1))
 		{
 			std::cerr << "bitrelation " << r << " is not satisfied!" << std::endl;
 			print_convert_msgbitrel(msgbitrels16[r], 1, 5);

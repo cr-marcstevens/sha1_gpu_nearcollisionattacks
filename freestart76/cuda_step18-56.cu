@@ -1,4 +1,9 @@
+/*****
+  Copyright (C) 2015 Marc Stevens, Centrum Wiskunde & Informatica (CWI), Amsterdam.
+            (C) 2015 Pierre Karpman, INRIA France/Nanyang Technological University Singapore (-2016), CWI (2016/2017), L'Universite Grenoble Alpes (2017-)
 
+  This file is part of sha1_gpu_nearcollisionattacks source-code and released under the MIT License
+*****/
 
 /************ TODO TODO **********\
 - clean up code (enable opts, remove old code)
@@ -51,7 +56,7 @@
 #include <stdexcept>
 
 
-using namespace hc;
+using namespace hashclash;
 using namespace std;
 
 #define CUDA_ASSERT(s) 	{ cudaError_t err = s; if (err != cudaSuccess) { throw std::runtime_error("CUDA command returned : " + string(cudaGetErrorString(err)) + "!"); }  }

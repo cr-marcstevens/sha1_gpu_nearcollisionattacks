@@ -1,3 +1,10 @@
+/*****
+  Copyright (C) 2015 Marc Stevens, Centrum Wiskunde & Informatica (CWI), Amsterdam.
+            (C) 2015 Pierre Karpman, INRIA France/Nanyang Technological University Singapore (-2016), CWI (2016/2017), L'Universite Grenoble Alpes (2017-)
+
+  This file is part of sha1_gpu_nearcollisionattacks source-code and released under the MIT License
+*****/
+
 #include "main.hpp"
 
 namespace cpu {
@@ -13,7 +20,7 @@ using namespace cpu;
 #include <iostream>
 
 using namespace std;
-using namespace hc;
+using namespace hashclash;
 
 /*** Bit condition masks for steps Q-4 to Q80, stored on the device in constant memory ***/
 
@@ -121,7 +128,7 @@ struct worker_t {
 	
 	void stepcount()
 	{
-		if (hc::hw(++count) == 1)
+		if (hashclash::hw(++count) == 1)
 		{
 			cout << "(" << count << "=" << (float(count)/runtime.time()) << "#/s)" << flush;
 			if (count >= 16384) exit(0);
@@ -798,7 +805,7 @@ bool verify(basesol_t basesol)
                         }
                         w ^= main_m1[t] & msgbitrels[r][t-mainblockoffset];
                 }
-                if (okay && 0 != (hc::hw(w)&1) )
+                if (okay && 0 != (hashclash::hw(w)&1) )
                 {
                         std::cerr << "bitrelation " << r << " is not satisfied!" << std::endl;
 			return false;

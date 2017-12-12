@@ -1,3 +1,10 @@
+#
+#  Copyright (C) 2015 Marc Stevens, Centrum Wiskunde & Informatica (CWI), Amsterdam.
+#            (C) 2015 Pierre Karpman, INRIA France/Nanyang Technological University Singapore (-2016), CWI (2016/2017), L'Universite Grenoble Alpes (2017-)
+#
+#  This file is part of sha1_gpu_nearcollisionattacks source-code and released under the MIT License
+#
+
 SUFFIXES=.cu
 
 EXTRA_DIST       = README.md LICENSE.TXT
@@ -7,7 +14,7 @@ AM_CPPFLAGS=-I$(top_srcdir)/lib -I$(top_srcdir)/contrib
 
 noinst_LIBRARIES=lib/libutil.a
 
-EXTRA_PROGRAMS=\
+noinst_PROGRAMS=\
 	bin/freestart76_basesolgen \
 	bin/freestart76_gpuattack \
 	bin/freestart80_basesolgen \
@@ -18,11 +25,10 @@ EXTRA_PROGRAMS=\
 
 
 lib_libutil_a_SOURCES=\
-	lib/types.hpp \
-	lib/base64.hpp \
-	lib/rng.cpp lib/rng.hpp \
-	lib/sha1detail.cpp lib/sha1detail.hpp \
 	lib/cuda_cyclicbuffer.hpp \
+	contrib/types.hpp \
+	contrib/rng.cpp contrib/rng.hpp \
+	contrib/sha1detail.cpp contrib/sha1detail.hpp \
 	contrib/program_options.hpp \
 	contrib/base64.hpp \
 	contrib/timer.hpp

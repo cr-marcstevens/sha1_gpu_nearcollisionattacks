@@ -23,7 +23,7 @@
 #include "tables_org.hpp"
 
 using namespace std;
-using namespace hc;
+using namespace hashclash;
 namespace po = program_options;
 
 int cuda_device, cuda_blocks, cuda_threads_per_block, cuda_scheduler;

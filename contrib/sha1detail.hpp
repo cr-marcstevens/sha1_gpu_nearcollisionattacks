@@ -1,8 +1,22 @@
-/*****
-  Copyright (C) 2016 Marc Stevens, Centrum Wiskunde & Informatica (CWI), Amsterdam.
-
-  This file is part of sha1freestart80 source-code and released under the MIT License
-*****/
+/**************************************************************************\
+|
+|    Copyright (C) 2009 Marc Stevens
+|    https://github.com/cr-marcstevens/hashclash
+|
+|    This program is free software: you can redistribute it and/or modify
+|    it under the terms of the GNU General Public License as published by
+|    the Free Software Foundation, either version 3 of the License, or
+|    (at your option) any later version.
+|
+|    This program is distributed in the hope that it will be useful,
+|    but WITHOUT ANY WARRANTY; without even the implied warranty of
+|    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+|    GNU General Public License for more details.
+|
+|    You should have received a copy of the GNU General Public License
+|    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+|
+\**************************************************************************/
 
 #ifndef HASHCLASH_SHA1DETAIL_HPP
 #define HASHCLASH_SHA1DETAIL_HPP
@@ -19,7 +33,7 @@
 #endif
 #endif
 
-namespace hc {
+namespace hashclash {
 
 	void sha1compress(uint32_t ihv[5], const uint32_t block[16]);
 	void sha1compress_me(uint32_t ihv[5], const uint32_t me[80]);
@@ -73,6 +87,7 @@ namespace hc {
 		for (i = int(offset)-1; i >= 0; --i)
 			block[i]=rotate_right(block[i+16], 1) ^ block[i+13] ^ block[i+8] ^ block[i+2];
 	}
+
 	FUNC_PREFIX inline void sha1_me_generalised(uint32_t block[80], const uint32_t msg[16], unsigned offset)
 	{
 		int i;
@@ -139,7 +154,7 @@ namespace hc {
 				sha1_step_round4(t, Q, me);
 		}
 	}
-
+        
 	FUNC_PREFIX inline void sha1_step_round1_bw(unsigned t, uint32_t Q[], const uint32_t me[])
 	{
 		const int offset = 4;
@@ -177,8 +192,9 @@ namespace hc {
 				sha1_step_round3_bw(t, Q, me);
 			else
 				sha1_step_round4_bw(t, Q, me);
+                
 		}
-	}
+        }
 
 	template<unsigned t>
 	FUNC_PREFIX inline void sha1_step_bw(uint32_t Q[], const uint32_t me[])
@@ -195,8 +211,6 @@ namespace hc {
 				sha1_step_round4_bw(t, Q, me);
 		}
 	}
-
-
 
 #if 0
 	inline void test_compress(const uint32_t ihv[5], uint32_t me[80]) {
@@ -221,7 +235,6 @@ namespace hc {
 		exit(0);
 	}
 #endif
-
-} // namespace hash
+} // namespace hashclash
 
 #endif //HASHCLASH_SHA1DETAIL_HPP

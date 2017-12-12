@@ -1,5 +1,22 @@
 # sha1_gpu_nearcollisionattacks
 
+## Publications
+
+This repository contains the source code belonging to three scientific publications:
+
+- *Practical free-start collision attacks on 76-step SHA-1*, Pierre Karpman, Thomas Peyrin, and Marc Stevens, CRYPTO 2015, Lecture Notes in Computer Science, vol. 9215, Springer, 2015, pp. 623-642.
+
+  This publication introduces the efficient GPU framework for SHA-1 collision finding and a freestart attack on 76-step SHA-1. The runtime cost is about 5 days on 1 NVIDIA GTX-970 GPU and was executed on the GPU cluster of Thomas Peyrin.
+
+- *Freestart collision for full SHA-1*, Marc Stevens, Pierre Karpman, Thomas Peyrin, EUROCRYPT 2016, Lecture Notes in Computer Science, vol. 9665, Springer, 2016, pp. 459-483.
+
+  This publication introduces a freestart attack on 80-step SHA-1 and presents a cost analysis for a (normal) collision attack for full SHA-1. The runtime cost is about 640 days on 1 NVIDIA GTX-970 GPU and was executed on the GPU cluster of Thomas Peyrin.
+
+- *The first collision for full SHA-1*, Marc Stevens, Elie Bursztein, Pierre Karpman, Ange Albertini, Yarik Markov, CRYPTO 2017, Lecture Notes in Computer Science, vol. 10401, Springer, 2017, pp. 570-596.
+
+  This publication presents a complete collision attack on full SHA-1. The majority of the runtime cost is about 110 years on 1 NVIDIA GTX-970 GPU and was executed on a distributed GPU system of Google. 
+  Note that only the second near-collision attack was implemented for GPU and is released here. The first near-collision attack of this project was already published in EUROCRYPT 2013 and is available at https://github.com/cr-marcstevens/hashclash.
+
 ## Requirements
 
  - CUDA SDK

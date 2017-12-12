@@ -104,7 +104,7 @@ inline bool verify(const q13sol_t& q13sol)
 	uint32_t m[16];
 	memcpy(m, q13sol.m, 16*4);
 	for (unsigned t = 0; t < 16; ++t)
-		hc::sha1_step_round1(t,Q,m);
+		hashclash::sha1_step_round1(t,Q,m);
 	return verify(0, 15, 13, Q, m, MBR_Q14NB);
 }
 inline bool verify(const q14sol_t& q14sol)
@@ -113,7 +113,7 @@ inline bool verify(const q14sol_t& q14sol)
 	uint32_t m[16];
 	memcpy(m, q14sol.m, 16*4);
 	for (unsigned t = 0; t < 16; ++t)
-		hc::sha1_step_round1(t,Q,m);
+		hashclash::sha1_step_round1(t,Q,m);
 	for (int t = 1; t <= 16; ++t)
 		if (Q[4+t] != q14sol.Q[t-1])
 			std::cerr << "WHAT?!?!?" << std::endl;
@@ -125,7 +125,7 @@ inline void step13nb(const q13sol_t& q13sol)
 	uint32_t Q1[85] = { /*0*/ 0xce2969ef, /*1*/ 0x7b1facd1, /*2*/ 0xaf216457, /*3*/ 0xffed5352, /*4*/ 0x8d64d617 }; // taken from Qset1cond
 	memcpy(m1, q13sol.m, 16*4);
 	for (unsigned t = 0; t < 16; ++t)
-		hc::sha1_step_round1(t,Q1,m1);
+		hashclash::sha1_step_round1(t,Q1,m1);
 	verify(0, 15, 13, Q1, m1, MBR_Q14NB);
 	step13nb(m1, Q1);
 }

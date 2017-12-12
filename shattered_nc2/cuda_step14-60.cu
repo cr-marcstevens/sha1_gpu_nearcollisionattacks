@@ -59,7 +59,7 @@ move neutral bits without bug
 #include <iomanip>
 #include <stdexcept>
 
-using namespace hc;
+using namespace hashclash;
 using namespace std;
 
 #define CUDA_ASSERT(s) 	{ cudaError_t err = s; if (err != cudaSuccess) { throw std::runtime_error("CUDA command returned: " + string(cudaGetErrorString(err)) + "!"); }  }

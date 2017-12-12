@@ -1,3 +1,10 @@
+dnl
+dnl  Copyright (C) 2015 Marc Stevens, Centrum Wiskunde & Informatica (CWI), Amsterdam.
+dnl            (C) 2015 Pierre Karpman, INRIA France/Nanyang Technological University Singapore (-2016), CWI (2016/2017), L'Universite Grenoble Alpes (2017-)
+dnl
+dnl  This file is part of sha1_gpu_nearcollisionattacks source-code and released under the MIT License
+dnl
+
 AC_PREREQ([2.68])
 AC_INIT([SHA1_GPU_NCA], [1.0.0], [marc@marc-stevens.nl],[SHA1_GPU_NCA],[https://github.com/cr-marcstevens/sha1_gpu_nearcollisionattacks])
 AC_CONFIG_SRCDIR([README.md])

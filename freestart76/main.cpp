@@ -1,3 +1,10 @@
+/*****
+  Copyright (C) 2015 Marc Stevens, Centrum Wiskunde & Informatica (CWI), Amsterdam.
+            (C) 2015 Pierre Karpman, INRIA France/Nanyang Technological University Singapore (-2016), CWI (2016/2017), L'Universite Grenoble Alpes (2017-)
+
+  This file is part of sha1_gpu_nearcollisionattacks source-code and released under the MIT License
+*****/
+
 #include "main.hpp"
 
 namespace maincpp {
@@ -19,7 +26,7 @@ using namespace maincpp;
 #include <cstdio>
 #include <algorithm>
 
-using namespace hc;
+using namespace hashclash;
 using namespace std;
 namespace po = program_options;
 
@@ -644,7 +651,7 @@ void found_basesol(uint32_t main_m1[80], uint32_t main_Q1[85], unsigned mainbloc
 	if (BASESOL_OK)
 	{
 		basesols.push_back(basesol);
-		if (hc::hw(basesols.size()) == 1)
+		if (hashclash::hw(basesols.size()) == 1)
 		{
 			cout << "{" << basesols.size() << "}" << flush;
 		}
