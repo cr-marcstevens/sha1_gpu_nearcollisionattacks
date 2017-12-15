@@ -60,11 +60,17 @@ This repository contains the source code belonging to three scientific publicati
 
  - Generate basesolutions (32 base64-encoded per textline)
 
- `bin/freestart80_basesolgen -g -o basesol80_1.txt -m 1024`
+ `bin/freestart80_basesolgen -g -o fs80_basesols.txt -m 1024`
 
- - Run GPU attack:
+ - Run GPU attack (generates 60-step solutions):
 
- `bin/freestart80_gpuattack -a -i basesol80_1.txt`
+ `bin/freestart80_gpuattack -a -i fs80_basesols.txt -o fs80_q60sols.txt`
+ 
+ - Check for collision among 60-step solutions:
+ 
+ `bin/freestart80_basesolgen -v -i fs80_q60sols.txt | grep Found -B88 -A52`
+
+- Repeat until collision found
 
 ## Find your own shattered 2nd near-collision block pair
 
@@ -72,8 +78,14 @@ This repository contains the source code belonging to three scientific publicati
 
  - Generate basesolutions (32 base64-encoded per textline)
 
- `bin/shatterednc2_basesolgen -g -o basesolnc2_1.txt -m 1024`
+ `bin/shatterednc2_basesolgen -g -o nc2_basesols.txt -m 1024`
 
  - Run GPU attack:
 
- `bin/shatterednc2_gpuattack -a -i basesolnc2_1.txt`
+ `bin/shatterednc2_gpuattack -a -i nc2_basesols.txt -o nc2_q61sols.txt`
+
+ - Check for collision among 61-step solutions:
+ 
+ `bin/shatterednc2_basesolgen -v -i nc2_q61sols.txt | grep Found -B88 -A52`
+
+- Repeat until collision found
